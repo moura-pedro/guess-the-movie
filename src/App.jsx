@@ -16,6 +16,8 @@ function App() {
     setShowHint,
     movieData,
     loading,
+    difficulty,
+    setDifficulty,
     handleGuess,
     startNewGame,
     getPointsForFrame,
@@ -42,6 +44,7 @@ function App() {
       <ScoreBoard
         score={score}
         pointsAvailable={getPointsForFrame(currentFrame)}
+        difficulty={difficulty} // Pass difficulty
       />
 
       <MovieFrame
