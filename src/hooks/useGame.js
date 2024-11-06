@@ -11,14 +11,15 @@ export function useGame() {
   const [movieData, setMovieData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [difficulty, setDifficulty] = useState('easy'); // Add difficulty state
 
   const movieService = new TMDBMovieService();
 
-  const loadNewMovie = async () => {
+  const loadNewMovie = async (difficultyLevel = 'easy') => {
     setLoading(true);
     setError(null);
     try {
-      const newMovie = await movieService.getRandomMovie();
+      const newMovie = await movieService.getRandomMovie(difficultyLevel);
       setMovieData(newMovie);
     } catch (error) {
       setError('Failed to load movie. Please try again.');
@@ -33,7 +34,9 @@ export function useGame() {
 
     // Make the comparison more forgiving
     const cleanGuess = userGuess.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    const correctAnswer = movieData.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const correctAnswer = movieData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
 
     if (cleanGuess === correctAnswer) {
       setScore(score + getPointsForFrame(currentFrame));
@@ -46,12 +49,13 @@ export function useGame() {
     }
   };
 
-  const startNewGame = async () => {
+  const startNewGame = async (difficultyLevel = 'easy') => {
     setCurrentFrame(0);
     setUserGuess('');
     setGameOver(false);
     setShowHint(false);
-    await loadNewMovie();
+    setDifficulty(difficultyLevel); // Update difficulty
+    await loadNewMovie(difficultyLevel);
   };
 
   const getPointsForFrame = (frameIndex) => {
@@ -59,7 +63,7 @@ export function useGame() {
   };
 
   useEffect(() => {
-    loadNewMovie();
+    loadNewMovie(difficulty);
   }, []);
 
   return {
@@ -73,6 +77,8 @@ export function useGame() {
     movieData,
     loading,
     error,
+    difficulty,
+    setDifficulty,
     handleGuess,
     startNewGame,
     getPointsForFrame,
